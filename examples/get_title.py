@@ -34,11 +34,16 @@ async def main():
         targets = await conn.execute(target.get_targets())
 
         for t in targets:
-            if (t.type == 'page' and
-                not t.url.startswith('devtools://') and
-                not t.attached):
-                target_id = t.target_id
-                break
+            try:
+                if (t.type== 'page' and
+                    not t.url.startswith('devtools://') and
+                    not t.attached):
+                    target_id = t.target_id
+                    # assert False   # A test line to force an error
+                    break
+            except Exception as e:
+                logging.error(f"Exception:{e}, target_id:{t}")
+                raise
 
         logger.info('Attaching to target id=%s', target_id)
         session = await conn.open_session(target_id)
